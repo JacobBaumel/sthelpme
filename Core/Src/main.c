@@ -93,15 +93,19 @@ int main(void)
   MX_ICACHE_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
-    uint32_t tick = HAL_GetTick();
+  uint32_t tick = HAL_GetTick();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while(1) {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
+        uint32_t newtick = HAL_GetTick();
+        if(newtick - tick > 1000) {
+            HAL_GPIO_TogglePin(USR_LED_GPIO_Port, USR_LED_Pin);
+            tick = newtick;
+        }
     }
   /* USER CODE END 3 */
 }
