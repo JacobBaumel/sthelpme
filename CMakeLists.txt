@@ -34,6 +34,16 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
+add_library(TINYUSB OBJECT
+        lib/tinyusb/src/tusb.c
+        lib/tinyusb/src/common/tusb_fifo.c
+        lib/tinyusb/src/device/usbd.c
+        lib/tinyusb/src/device/usbd_control.c
+        lib/tinyusb/src/class/cdc/cdc_device.c
+)
+
+target_include_directories(TINYUSB PUBLIC lib/tinyusb/src Core/Inc)
+
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
@@ -42,27 +52,27 @@ add_subdirectory(cmake/stm32cubemx)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined library search paths
+        # Add user defined library search paths
 )
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
+        # Add user sources here
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined include paths
+        # Add user defined include paths
 )
 
 # Add project symbols (macros)
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined symbols
+        # Add user defined symbols
 )
 
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
-    stm32cubemx
-
-    # Add user defined libraries
+        stm32cubemx
+        # Add user defined libraries
+        TINYUSB
 )

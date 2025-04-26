@@ -58,7 +58,9 @@ static void MX_USB_PCD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+// uint8_t const* tud_descriptor_device_qualifier_cb(void) {
+//     return NULL;
+// }
 /* USER CODE END 0 */
 
 /**
