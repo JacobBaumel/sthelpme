@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tusb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,7 +71,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+    // tud_init(BOARD_TUD_RHPORT);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,6 +102,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while(1) {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
         uint32_t newtick = HAL_GetTick();
         if(newtick - tick > 1000) {
