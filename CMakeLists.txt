@@ -59,7 +59,8 @@ target_compile_definitions(tinyusb PRIVATE
         -DCFG_TUSB_CONFIG_FILE="${CMAKE_SOURCE_DIR}/Core/Inc/tusb/tusb_config.h")
 
 # Create an executable object type
-add_executable(${CMAKE_PROJECT_NAME})
+add_executable(${CMAKE_PROJECT_NAME}
+        Core/Src/usb_descriptors.c)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
