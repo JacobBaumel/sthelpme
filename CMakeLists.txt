@@ -43,6 +43,7 @@ add_library(tinyusb OBJECT
         lib/tinyusb/src/portable/st/typec/typec_stm32.c
         lib/tinyusb/src/typec/usbc.c
         lib/tinyusb/src/class/cdc/cdc_device.c
+        lib/tinyusb/src/class/msc/msc_device.c
 )
 
 target_include_directories(tinyusb
@@ -60,7 +61,10 @@ target_compile_definitions(tinyusb PRIVATE
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME}
-        Core/Src/usb_descriptors.c)
+        Core/Src/usb_descriptors.c
+        Core/Src/usb_msc.c
+        Core/Inc/disk.h
+)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)

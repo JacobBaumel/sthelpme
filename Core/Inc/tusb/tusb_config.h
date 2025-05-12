@@ -30,5 +30,6 @@
 #define CFG_TUD_CDC_RX_BUFSIZE              64
 #define CFG_TUD_CDC_TX_BUFSIZE              64
 #define CFG_TUD_CDC_EP_BUFSIZE              64
+#define CFG_TUD_MSC_EP_BUFSIZE              512
 
 #endif //TUSB_CONFIG_H
