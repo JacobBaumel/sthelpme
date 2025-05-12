@@ -58,6 +58,10 @@ void led_task(void) {
     if(tick - lastTick > BLINK_SPEED) {
         lastTick = tick;
         HAL_GPIO_TogglePin(USR_LED_GPIO_Port, USR_LED_Pin);
+        if(tud_cdc_connected()) {
+            uint8_t buf[] = {'h', 'e', 'l', 'l', 'o', '\n'};
+            tud_cdc_n_write(0, buf, sizeof(buf));
+        }
     }
 }
 
@@ -118,7 +122,7 @@ int main(void) {
     SystemClock_Config();
 
     /* USER CODE BEGIN SysInit */
-
+    __HAL_RCC_USB_CLK_ENABLE();
     /* USER CODE END SysInit */
 
     /* Initialize all configured peripherals */
@@ -126,7 +130,7 @@ int main(void) {
     MX_ICACHE_Init();
     MX_USB_PCD_Init();
     /* USER CODE BEGIN 2 */
-    uint32_t tick = HAL_GetTick();
+    tud_init(BOARD_TUD_RHPORT);
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -134,6 +138,7 @@ int main(void) {
     while(1) {
         led_task();
         cdc_task();
+        tud_task();
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
