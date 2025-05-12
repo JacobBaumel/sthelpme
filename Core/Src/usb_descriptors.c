@@ -27,20 +27,26 @@ uint8_t const* tud_descriptor_device_cb(void) {
 }
 
 enum {
-    ITF_NUM_CDC_0 = 0,
-    ITF_NUM_CDC_0_DATA,
+    ITF_NUM_CDC = 0,
+    ITF_NUM_CDC_DATA,
+    ITF_NUM_MSC_0,
     ITF_NUM_TOTAL
 };
 
-#define EPNUM_CDC_0_NOTIF   0x81
-#define EPNUM_CDC_0_OUT     0x02
-#define EPNUM_CDC_0_IN      0x82
+enum {
+    EPNUM_CDC_NOTIF = 0x81,
+    EPNUM_CDC_OUT   = 0x02,
+    EPNUM_CDC_IN    = 0x82,
+    EPNUM_MSC_OUT   = 0x03,
+    EPNUM_MSC_IN    = 0x83,
+};
 
-#define CONFIG_TOTAL_LEN    (TUD_CONFIG_DESC_LEN + CFG_TUD_CDC * TUD_CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN + TUD_MSC_DESC_LEN)
 
 uint8_t const CONFIG_DESC[] = {
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, 0x00, 100),
-    TUD_CDC_DESCRIPTOR(ITF_NUM_CDC_0, 4, EPNUM_CDC_0_NOTIF, 8, EPNUM_CDC_0_OUT, EPNUM_CDC_0_IN, 64)
+    TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, 4, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
+    TUD_MSC_DESCRIPTOR(ITF_NUM_MSC_0, 5, EPNUM_MSC_OUT, EPNUM_MSC_IN, 64)
 };
 
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index) {
@@ -54,6 +60,7 @@ enum {
     STRID_PRODUCT,
     STRID_SERIAL,
     STRID_CDC,
+    STRID_MSC,
 };
 
 char const* STRING_DESC[] = {
@@ -61,7 +68,8 @@ char const* STRING_DESC[] = {
     "LRI Electronics",
     "Crystalline Echo",
     "000000001",
-    "Crystalline Echo Serial Interface"
+    "Crystalline Echo Serial Interface",
+    "Crystalline Echo Mass Storage Interface"
 };
 
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
