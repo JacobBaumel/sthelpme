@@ -1,3 +1,6 @@
+#include <stm32h5xx_hal_gpio.h>
+#include "main.h"
+
 #include "tusb.h"
 #include "class/msc/msc_device.h"
 
@@ -17,32 +20,32 @@ void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16
 
 bool tud_msc_test_unit_ready_cb(uint8_t lun) {
     (void) lun;
-    return true;
+    return cardDet;
 }
 
 void tud_msc_capacity_cb(uint8_t lun, uint32_t *block_count, uint16_t *block_size) {
     (void) lun;
 
-    *block_count = DISK_BLOCKS;
-    *block_size = DISK_BLOCK_SIZE;
+    *block_count = cardInfo.LogBlockNbr;
+    *block_size = cardInfo.LogBlockSize;
 }
 
 int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) {
     (void) lun;
 
     // out of ramdisk
-    if (lba >= DISK_BLOCKS) {
+    if (lba >= cardInfo.LogBlockNbr) {
         return -1;
     }
 
     // Check for overflow of offset + bufsize
-    if (offset + bufsize > DISK_BLOCK_SIZE) {
+    if (offset + bufsize > cardInfo.LogBlockSize) {
         return -1;
     }
 
-    uint8_t const *addr = DISK[lba] + offset;
-    memcpy(buffer, addr, bufsize);
-
+    uint8_t* data[cardInfo.LogBlockSize] = {0};
+    HAL_SD_ReadBlocks(&hsd1, data, lba, 1);
+    memcpy(buffer, data + offset, bufsize);
     return (int32_t) bufsize;
 }
 

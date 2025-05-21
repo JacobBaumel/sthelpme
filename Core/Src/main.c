@@ -84,6 +84,10 @@ static void cdc_task(void) {
     }
 }
 
+static int cardDet = 0;
+static HAL_SD_CardInfoTypeDef cardInfo;
+int prevPinVal = 0;
+
 
 /* USER CODE END PV */
 
@@ -141,7 +145,21 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while(1) {
-        led_task();
+        int pinVal = HAL_GPIO_ReadPin(SD_CARD_DET_GPIO_Port, SD_CARD_DET_Pin);
+        if(pinVal && !prevPinVal) {
+            if(HAL_SD_InitCard(&hsd1) == HAL_OK) {
+                HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_SET);
+                HAL_SD_GetCardInfo(&hsd1, &cardInfo);
+                cardDet = 1;
+            }
+            else {
+                HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
+                cardDet = 0;
+            }
+        }
+
+        prevPinVal = pinVal;
+
         cdc_task();
         tud_task();
     /* USER CODE END WHILE */
@@ -253,7 +271,7 @@ static void MX_SDMMC1_SD_Init(void)
   hsd1.Instance = SDMMC1;
   hsd1.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   hsd1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-  hsd1.Init.BusWide = SDMMC_BUS_WIDE_1B;
+  hsd1.Init.BusWide = SDMMC_BUS_WIDE_4B;
   hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
   hsd1.Init.ClockDiv = 5;
   if (HAL_SD_Init(&hsd1) != HAL_OK)
@@ -319,6 +337,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
@@ -329,6 +348,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(USR_LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SD_CARD_DET_Pin */
+  GPIO_InitStruct.Pin = SD_CARD_DET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SD_CARD_DET_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

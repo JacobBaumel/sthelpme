@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32h5xx_hal_sd.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,9 +59,13 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USR_LED_Pin GPIO_PIN_5
 #define USR_LED_GPIO_Port GPIOA
+#define SD_CARD_DET_Pin GPIO_PIN_3
+#define SD_CARD_DET_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+extern static int cardDet;
+extern static HAL_SD_CardInfoTypeDef cardInfo;
+extern SD_HandleTypeDef hsd1;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
