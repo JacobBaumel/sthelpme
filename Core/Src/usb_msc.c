@@ -1,3 +1,4 @@
+#include <stm32h5xx_hal.h>
 #include <stm32h5xx_hal_gpio.h>
 #include "main.h"
 
@@ -44,8 +45,8 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void *buff
         return -1;
     }
 
-    uint8_t* data[cardInfo.LogBlockSize] = {0};
-    HAL_SD_ReadBlocks(&hsd1, data, lba, 1);
+    uint8_t data[cardInfo.LogBlockSize];
+    HAL_SD_ReadBlocks(&hsd1, data, lba, 1, 10);
     memcpy(buffer, data + offset, bufsize);
     return (int32_t) bufsize;
 }
