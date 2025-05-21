@@ -63,8 +63,8 @@ void Error_Handler(void);
 #define SD_CARD_DET_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-extern static int cardDet;
-extern static HAL_SD_CardInfoTypeDef cardInfo;
+extern int cardDet;
+extern HAL_SD_CardInfoTypeDef cardInfo;
 extern SD_HandleTypeDef hsd1;
 /* USER CODE END Private defines */
 

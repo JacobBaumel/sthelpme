@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "tusb.h"
 /* USER CODE END Includes */
 
@@ -61,8 +62,7 @@ void led_task(void) {
         lastTick = tick;
         HAL_GPIO_TogglePin(USR_LED_GPIO_Port, USR_LED_Pin);
         if(tud_cdc_connected()) {
-            uint8_t buf[] = {'h', 'e', 'l', 'l', 'o', '\n'};
-            tud_cdc_n_write(0, buf, sizeof(buf));
+            printf("hello\n");
         }
     }
 }
@@ -84,8 +84,8 @@ static void cdc_task(void) {
     }
 }
 
-static int cardDet = 0;
-static HAL_SD_CardInfoTypeDef cardInfo;
+int cardDet = 0;
+HAL_SD_CardInfoTypeDef cardInfo;
 int prevPinVal = 0;
 
 
@@ -145,20 +145,20 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while(1) {
-        int pinVal = HAL_GPIO_ReadPin(SD_CARD_DET_GPIO_Port, SD_CARD_DET_Pin);
-        if(pinVal && !prevPinVal) {
-            if(HAL_SD_InitCard(&hsd1) == HAL_OK) {
-                HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_SET);
-                HAL_SD_GetCardInfo(&hsd1, &cardInfo);
-                cardDet = 1;
-            }
-            else {
-                HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
-                cardDet = 0;
-            }
-        }
-
-        prevPinVal = pinVal;
+        // int pinVal = HAL_GPIO_ReadPin(SD_CARD_DET_GPIO_Port, SD_CARD_DET_Pin);
+        // if(pinVal && !prevPinVal) {
+        //     if(HAL_SD_InitCard(&hsd1) == HAL_OK) {
+        //         HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_SET);
+        //         HAL_SD_GetCardInfo(&hsd1, &cardInfo);
+        //         cardDet = 1;
+        //     }
+        //     else {
+        //         HAL_GPIO_WritePin(USR_LED_GPIO_Port, USR_LED_Pin, GPIO_PIN_RESET);
+        //         cardDet = 0;
+        //     }
+        // }
+        //
+        // prevPinVal = pinVal;
 
         cdc_task();
         tud_task();
@@ -361,7 +361,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+int __io_putchar(int ch) {
+    if(!tud_cdc_connected()) return EOF;
+    return tud_cdc_n_write_char(BOARD_TUD_RHPORT, ch) == 1 ? ch : EOF;
+}
 /* USER CODE END 4 */
 
 /**
