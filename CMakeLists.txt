@@ -64,6 +64,7 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Src/usb_descriptors.c
         Core/Src/usb_msc.c
         Core/Inc/disk.h
+        Core/Src/SDUtils.c
 )
 
 # Add STM32CubeMX generated sources

@@ -59,12 +59,10 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USR_LED_Pin GPIO_PIN_5
 #define USR_LED_GPIO_Port GPIOA
-#define SD_CARD_DET_Pin GPIO_PIN_3
-#define SD_CARD_DET_GPIO_Port GPIOB
+#define SD_CARD_DET_Pin GPIO_PIN_7
+#define SD_CARD_DET_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
-extern int cardDet;
-extern HAL_SD_CardInfoTypeDef cardInfo;
 extern SD_HandleTypeDef hsd1;
 /* USER CODE END Private defines */
 

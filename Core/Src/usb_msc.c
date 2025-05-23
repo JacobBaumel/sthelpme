@@ -1,6 +1,8 @@
 #include <stm32h5xx_hal.h>
 #include <stm32h5xx_hal_gpio.h>
+
 #include "main.h"
+#include "SDUtils.h"
 
 #include "tusb.h"
 #include "class/msc/msc_device.h"
