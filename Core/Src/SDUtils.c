@@ -1,7 +1,6 @@
 #include "SDUtils.h"
 
 HAL_SD_CardInfoTypeDef cardInfo;
-int cardDet;
 
 // Stolen from HAL_SD_Init
 HAL_StatusTypeDef initSDCard() {
@@ -58,4 +57,27 @@ HAL_StatusTypeDef initSDCard() {
     hsd1.State = HAL_SD_STATE_READY;
 
     return HAL_OK;
+}
+
+void cardDetTask() {
+    static GPIO_PinState prevState = GPIO_PIN_RESET;
+    GPIO_PinState curState = HAL_GPIO_ReadPin(SD_CARD_DET_GPIO_Port, SD_CARD_DET_Pin);
+
+    // If the card detection pin value did not change, do nothing
+    if(curState == prevState) return;
+    prevState = curState;
+
+    // If a card has been detected, initialize the card
+    if(curState == GPIO_PIN_RESET) {
+        if(hsd1.State != HAL_SD_STATE_RESET) return;
+        if(initSDCard() == HAL_OK) {
+            HAL_SD_GetCardInfo(&hsd1, &cardInfo);
+        }
+    }
+
+    // Otherwise deinitialize
+    else {
+        if(hsd1.State == HAL_SD_STATE_RESET) return;
+        hsd1.State = HAL_SD_STATE_RESET;
+    }
 }

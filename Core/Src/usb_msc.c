@@ -23,19 +23,26 @@ void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16
 
 bool tud_msc_test_unit_ready_cb(uint8_t lun) {
     (void) lun;
-    // return cardDet;
-    return false;
+    return hsd1.State != HAL_SD_STATE_RESET;
 }
 
 void tud_msc_capacity_cb(uint8_t lun, uint32_t *block_count, uint16_t *block_size) {
     (void) lun;
+    if(hsd1.State == HAL_SD_STATE_RESET) {
+        *block_count = 0;
+        *block_size = 0;
+    }
 
-    *block_count = cardInfo.LogBlockNbr;
-    *block_size = cardInfo.LogBlockSize;
+    else {
+        *block_count = cardInfo.LogBlockNbr;
+        *block_size = cardInfo.LogBlockSize;
+    }
 }
 
 int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void *buffer, uint32_t bufsize) {
     (void) lun;
+
+    if(hsd1.State == HAL_SD_STATE_RESET) return -1;
 
     // out of ramdisk
     if (lba >= cardInfo.LogBlockNbr) {
@@ -48,24 +55,42 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void *buff
     }
 
     uint8_t data[cardInfo.LogBlockSize];
-    HAL_SD_ReadBlocks(&hsd1, data, lba, 1, 10);
+    HAL_StatusTypeDef ret = HAL_SD_ReadBlocks(&hsd1, data, lba, 1, 100);
+    if(HAL_OK != ret) {
+        printf("Read failed with code: %d\n", ret);
+        return -1;
+    }
+
     memcpy(buffer, data + offset, bufsize);
     return (int32_t) bufsize;
 }
 
 bool tud_msc_is_writable_cb(uint8_t lun) {
     (void) lun;
-    return true;
+    return tud_msc_test_unit_ready_cb(0);
 }
 
 int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t *buffer, uint32_t bufsize) {
     (void) lun;
 
-    // out of ramdisk
-    if (lba >= DISK_BLOCKS) return -1;
+    if(hsd1.State == HAL_SD_STATE_RESET) return -1;
 
-    uint8_t *addr = DISK[lba] + offset;
-    memcpy(addr, buffer, bufsize);
+    // out of ramdisk
+    if (lba >= cardInfo.LogBlockNbr) return -1;
+
+    uint8_t data[cardInfo.LogBlockSize];
+    HAL_StatusTypeDef ret = HAL_SD_ReadBlocks(&hsd1, data, lba, 1, 100);
+    if(ret != HAL_OK) {
+        printf("REad to write Failed with code: %d\n", ret);
+        return -1;
+    }
+
+    memcpy(data + offset, buffer, bufsize);
+    ret = HAL_SD_WriteBlocks(&hsd1, data, lba, 1, 100);
+    if(ret != HAL_OK) {
+        printf("Write failed with code: %d\n", ret);
+        return -1;
+    }
 
     return (int32_t) bufsize;
 }

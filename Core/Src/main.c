@@ -161,10 +161,13 @@ int main(void) {
         //
         // prevPinVal = pinVal;
 
-        // led_task();
+        led_task();
+        cardDetTask();
         cdc_task();
         tud_task();
-        printf("Card info: %lu\n", cardInfo.LogBlockSize);
+        // if(hsd1.State != HAL_SD_STATE_RESET) printf("Card info: %lu\n", cardInfo.LogBlockSize);
+        // else printf("No card inserted!\n");
+        // HAL_Delay(50);
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
